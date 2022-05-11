@@ -8,6 +8,7 @@ import './GameEngine.css';
 import Row from './Row';
 
 
+const startSpeed = 0.5;
 let player = undefined;
 let keys = {};
 let cards = [];
@@ -18,9 +19,10 @@ let explosions = [];
 let rows = [];
 let particles = [];
 let score = 0;
-let gameSpeed = 0.5;
+let gameSpeed = 0;
 let pauseGame = false;
 let totalInvaders = 0;
+let edgeDetected = false;
 
 
 
@@ -110,6 +112,8 @@ class GameEngine extends React.Component {
 
   addToScore = (points) => {
     score += points;
+    totalInvaders--;
+    console.log(totalInvaders);
   }
 
   collisionDetected = (obj1, obj2) => {
@@ -125,8 +129,15 @@ class GameEngine extends React.Component {
     }
   }
 
-  getSpeed =() => {
+  getSpeed = () => {
     return gameSpeed;
+  }
+
+  setEdgeDetected = (status) => {
+    edgeDetected = status;
+  }
+  getEdgeDetected = () => {
+    return edgeDetected;
   }
 
 
@@ -171,7 +182,7 @@ class GameEngine extends React.Component {
           // Setup Game Scene / Reset Varaiables
           keys = {}; cards = []; invoices = []; paids = [];
           bits = []; explosions = []; particles = []; score = 0;
-          gameSpeed = 0.5; pauseGame = false; totalInvaders = 0;
+          gameSpeed = startSpeed; pauseGame = false; totalInvaders = 0; edgeDetected = false;
 
           player = new Player(this.gameLost, this.getKeys, this.pushCard);
 
@@ -183,31 +194,33 @@ class GameEngine extends React.Component {
           const invadersPerRow = 5;
           const invadersRows = 3;
 
+          let maxFraud = 2;
+          let maxOverCharge = 2;
+          let maxMultiPay = 3;
           for (let i = 0; i < invadersRows; i++) {
 
             const rowHeight = invaderHeight;
             const rowSpacing = 30;
-            const row = new Row(i, rowHeight * i + rowSpacing, rowHeight, this.getSpeed);
+            const row = new Row(i, rowHeight * i + rowSpacing, rowHeight, this.getSpeed, this.getEdgeDetected, this.setEdgeDetected);
             rows.push(row);
             let pos = screenCenter - (((invadersPerRow * invaderWidth) + (invadersPerRow - 1) * invaderSpacing))/2;
             
-            let maxFraud = 2;
-            let maxOverCharge = 2;
             for (let j = 0; j < invadersPerRow; j++) {
               const randNum = Math.random() * 100 + 1;
               let invaderType = 0;
               if (maxFraud > 0 && randNum > 90) { invaderType = 5; maxFraud--;}
               if (maxOverCharge > 0 && randNum > 80 && randNum < 91) { invaderType = 4; maxOverCharge--;}
-              if (randNum > 40 && randNum < 81) invaderType = 3;
+              if (maxMultiPay > 0 && randNum > 40 && randNum < 81) {invaderType = 3; maxMultiPay--;}
               // Force at least 1 of each
-              if (maxFraud > 0 && i === 0 && j === 1) invaderType = 5;
-              if (maxOverCharge > 0 && i === 0 && j === 3) invaderType = 4;
+              if (maxFraud > 0 && i === 0 && j === 1) { invaderType = 5; maxFraud--;}
+              if (maxOverCharge > 0 && i === 0 && j === 3) { invaderType = 4; maxOverCharge--;}
               
-              const invoice = new Invoice(invaderType, pos, row.y, this.getCards, this.addToScore, this.pushPaid, this.pushExplosion, row, player, this.gameLost);
+              const invoice = new Invoice(invaderType, pos, row.y, this.getCards, this.addToScore, this.pushPaid, this.pushExplosion, row, player, this.gameLost, this.setEdgeDetected);
               invoices.push(invoice);
               pos = pos + invaderWidth + invaderSpacing;
             }
           }
+          totalInvaders = invoices.length;
 
           lastScene = scene;
         } else {

@@ -5,7 +5,7 @@ import Explosion from './Explosion';
 
 class Invoice {
 
-  constructor(type, x, y, getCards, addToScore, pushPaids, pushExplosion, row, player, gameLost) {
+  constructor(type, x, y, getCards, addToScore, pushPaids, pushExplosion, row, player, gameLost, setEdgeDetected) {
     this.spriteWidth = 500;
     this.spriteHeight = 500;
     this.sizeModifier = 0.3;
@@ -33,6 +33,7 @@ class Invoice {
     this.pushExplosion = pushExplosion;
     this.player = player;
     this.gameLost = gameLost;
+    this.setEdgeDetected = setEdgeDetected;
     
     
   }
@@ -59,9 +60,9 @@ class Invoice {
     if (!this.row.changeInProgress) {
       // Check for Edge
       if (this.row.direction === 'RIGHT' && this.x > window.innerWidth - this.width) {
-        this.row.edgeDetected = true;
+        this.setEdgeDetected(true);
       } else if (this.row.direction === 'LEFT' && this.x < 0) {
-        this.row.edgeDetected = true;
+        this.setEdgeDetected(true);
       }
     }
     
@@ -73,15 +74,15 @@ class Invoice {
 
       // Adjust for space around image
       const myX = this.x + this.width * 0.25;
-      const myW = this.width * 0.55;
+      const myW = this.width * 0.5;
       const myY = this.y + this.height * 0.25;
       const myH = this.height * 0.55;
 
       // Check for Player Collision
-      const pX = this.player.x;
-      const pW = this.player.width * 0.76;
-      const pY = this.player.y;
-      const pH = this.player.height;
+      const pX = this.player.x + this.player.width * 0.25;
+      const pW = this.player.width * 0.55;
+      const pY = this.player.y + this.player.height * 0.10;
+      const pH = this.player.height * 0.95;
       if (pX > myX + myW ||
         pX + pW < myX ||
         pY > myY + myH ||
@@ -89,6 +90,8 @@ class Invoice {
           // no collision       
       } else {
         // *** collision with PLAYER detected ***
+        console.log('pX: ' + pX + '  pW: ' + pW + '  pY: ' + pY + '  pH: ' + pH);
+        console.log('mX: ' + myX + '  mW: ' + myW + '  mY: ' + myY + '  mH: ' + myH);
         this.gameLost();
       }
 

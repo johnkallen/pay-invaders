@@ -1,6 +1,6 @@
 class Row {
 
-  constructor(id, y, distanceToNextRow, getGameSpeed) {
+  constructor(id, y, distanceToNextRow, getGameSpeed, getEdge, setEdge) {
     
     this.id = id;
     this.y = y;
@@ -12,12 +12,15 @@ class Row {
     this.changeInProgress = false;
     this.speed = 0;
     this.getGameSpeed = getGameSpeed;
+    this.getEdge = getEdge;
+    this.setEdge = setEdge;
 
   }
 
   update(deltatime) {
 
     this.speed = this.getGameSpeed();
+    this.edgeDetected = this.getEdge();
 
     if (this.direction !== 'DOWN' && this.edgeDetected) {
       this.prevDirection = this.direction;
@@ -33,6 +36,7 @@ class Row {
         }
         
         this.edgeDetected = false;
+        this.setEdge(false);
       }
 
 

@@ -146,7 +146,7 @@ class Player {
     const y = window.innerHeight - (this.spriteHeight * this.sizeModifier) - (window.innerHeight * 0.03);
 
 
-    // ctx.strokeRect(this.x,this.y,this.width,this.height);
+    ctx.strokeRect(this.x,this.y,this.width,this.height);
 
     if (this.facingLeft) {
       // FLIP IMAGE
