@@ -3,7 +3,6 @@ import Canvas from './Canvas';
 import BGScene from './BGScene';
 import Player from './Player';
 import Invoice from './Invoice';
-import Explosion from './Explosion';
 
 import './GameEngine.css';
 import Row from './Row';
@@ -19,7 +18,9 @@ let explosions = [];
 let rows = [];
 let particles = [];
 let score = 0;
-
+let gameSpeed = 0.5;
+let pauseGame = false;
+let totalInvaders = 0;
 
 
 
@@ -54,12 +55,14 @@ class GameEngine extends React.Component {
   }
 
   gameLost = () => {
-    const num = Math.random();
-    this.setState({
-      gamePaused: true
-    }, () => {
-      // console.log("Game Paused");
-    });
+    console.log('Game Lost');
+    pauseGame = true;
+    // const num = Math.random();
+    // this.setState({
+    //   gamePaused: true
+    // }, () => {
+    //   // console.log("Game Paused");
+    // });
   }
 
   drawScore = (ctx) => {
@@ -122,6 +125,12 @@ class GameEngine extends React.Component {
     }
   }
 
+  getSpeed =() => {
+    return gameSpeed;
+  }
+
+
+
 
   animate = (ctx, timestamp) => {
 
@@ -162,9 +171,12 @@ class GameEngine extends React.Component {
           // Setup Game Scene / Reset Varaiables
           keys = {}; cards = []; invoices = []; paids = [];
           bits = []; explosions = []; particles = []; score = 0;
+          gameSpeed = 0.5; pauseGame = false; totalInvaders = 0;
+
+          player = new Player(this.gameLost, this.getKeys, this.pushCard);
 
           const screenCenter = window.innerWidth/2;
-          const testInvoice = new Invoice(0, window.innerWidth/2, window.innerHeight/3, this.getCards, this.addToScore, this.pushPaid, this.pushExplosion);
+          const testInvoice = new Invoice(0, window.innerWidth/2, window.innerHeight/3, this.getCards, this.addToScore, this.pushPaid, this.pushExplosion, new Row());
           const invaderWidth = testInvoice.width;
           const invaderHeight = testInvoice.height;
           const invaderSpacing = invaderWidth * 0.2;
@@ -174,37 +186,41 @@ class GameEngine extends React.Component {
           for (let i = 0; i < invadersRows; i++) {
 
             const rowHeight = invaderHeight;
-            const row = new Row(i, rowHeight * i + 30);
+            const rowSpacing = 30;
+            const row = new Row(i, rowHeight * i + rowSpacing, rowHeight, this.getSpeed);
             rows.push(row);
             let pos = screenCenter - (((invadersPerRow * invaderWidth) + (invadersPerRow - 1) * invaderSpacing))/2;
             
+            let maxFraud = 2;
+            let maxOverCharge = 2;
             for (let j = 0; j < invadersPerRow; j++) {
               const randNum = Math.random() * 100 + 1;
               let invaderType = 0;
-              if (randNum > 90) invaderType = 5;
-              if (randNum > 80 && randNum < 91) invaderType = 4;
+              if (maxFraud > 0 && randNum > 90) { invaderType = 5; maxFraud--;}
+              if (maxOverCharge > 0 && randNum > 80 && randNum < 91) { invaderType = 4; maxOverCharge--;}
               if (randNum > 40 && randNum < 81) invaderType = 3;
               // Force at least 1 of each
-              if (i === 0 && j === 1) invaderType = 5;
-              if (i === 0 && j === 3) invaderType = 4;
+              if (maxFraud > 0 && i === 0 && j === 1) invaderType = 5;
+              if (maxOverCharge > 0 && i === 0 && j === 3) invaderType = 4;
               
-              const invoice = new Invoice(invaderType, pos, row.y, this.getCards, this.addToScore, this.pushPaid, this.pushExplosion, row);
+              const invoice = new Invoice(invaderType, pos, row.y, this.getCards, this.addToScore, this.pushPaid, this.pushExplosion, row, player, this.gameLost);
               invoices.push(invoice);
               pos = pos + invaderWidth + invaderSpacing;
             }
           }
-          player = new Player(this.gameLost, this.getKeys, this.pushCard);
-            
-          
 
           lastScene = scene;
         } else {
-          // Manage Game Scene
-          this.drawScore(ctx);
-  
-          // Update Objects
-          player.update(deltatime);
-          [...particles, ...explosions, ...invoices, ...cards, ...paids].forEach(object => object.update(deltatime));
+
+           // Manage Game Scene
+           this.drawScore(ctx);
+
+          if (!pauseGame) {
+            
+            // Update Objects
+            player.update(deltatime);
+            [...particles, ...explosions, ...invoices, ...cards, ...paids, ...rows].forEach(object => object.update(deltatime));
+          }
 
           // Draw Objects
           player.draw(ctx);
@@ -217,7 +233,8 @@ class GameEngine extends React.Component {
           invoices = invoices.filter(object => !object.markedForDeletion);
           paids = paids.filter(object => !object.markedForDeletion);
 
-          if (this.state.gamePaused) this.drawGameOver(ctx);
+          if (pauseGame) this.drawGameOver(ctx);
+          
 
         }
         break;

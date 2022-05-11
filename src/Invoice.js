@@ -5,7 +5,7 @@ import Explosion from './Explosion';
 
 class Invoice {
 
-  constructor(type, x, y, getCards, addToScore, pushPaids, pushExplosion, row) {
+  constructor(type, x, y, getCards, addToScore, pushPaids, pushExplosion, row, player, gameLost) {
     this.spriteWidth = 500;
     this.spriteHeight = 500;
     this.sizeModifier = 0.3;
@@ -14,9 +14,7 @@ class Invoice {
     this.x = x;
     this.y = y;
     this.lastX = this.x;
-    this.speed = 5;
-    this.directionX = this.speed;
-    this.directionY = 0;
+    this.row = row;
     this.markedForDeletion = false;
     this.facingLeft = false;
     this.image = new Image();
@@ -33,7 +31,9 @@ class Invoice {
     this.addToScore = addToScore;
     this.pushPaids = pushPaids;
     this.pushExplosion = pushExplosion;
-    this.row = row;
+    this.player = player;
+    this.gameLost = gameLost;
+    
     
   }
 
@@ -45,8 +45,27 @@ class Invoice {
       if (this.frame > this.maxFrame) this.frame = 0;
       else this.frame++;
       this.timeSinceLastFrame = 0;
-
     }
+    
+    // Move Invoice
+    if (this.row.direction === 'RIGHT') {
+      this.x += this.row.speed;
+    } else if (this.row.direction === 'LEFT') {
+      this.x += -this.row.speed;
+    }
+
+    this.y = this.row.y; // updated via row object
+
+    if (!this.row.changeInProgress) {
+      // Check for Edge
+      if (this.row.direction === 'RIGHT' && this.x > window.innerWidth - this.width) {
+        this.row.edgeDetected = true;
+      } else if (this.row.direction === 'LEFT' && this.x < 0) {
+        this.row.edgeDetected = true;
+      }
+    }
+    
+    
 
     if (this.type < 6) {
       // Check for Collisions
@@ -57,6 +76,21 @@ class Invoice {
       const myW = this.width * 0.55;
       const myY = this.y + this.height * 0.25;
       const myH = this.height * 0.55;
+
+      // Check for Player Collision
+      const pX = this.player.x;
+      const pW = this.player.width * 0.76;
+      const pY = this.player.y;
+      const pH = this.player.height;
+      if (pX > myX + myW ||
+        pX + pW < myX ||
+        pY > myY + myH ||
+        pY + pH < myY) {
+          // no collision       
+      } else {
+        // *** collision with PLAYER detected ***
+        this.gameLost();
+      }
 
       [...cards].forEach(object => {
         
@@ -71,38 +105,38 @@ class Invoice {
             case 1:
               object.markedForDeletion = true;
               this.type = 6;
-              this.addToScore(10);
+              this.addToScore(300);
               this.markedForDeletion = true;
               this.pushPaids(new Paid(this.x, this.y, this.frame));
               break;
             case 2:
               object.markedForDeletion = true;
               this.type = 1;
-              this.addToScore(10);
+              this.addToScore(150);
               this.pushPaids(new Paid(this.x, this.y, this.frame));
               break;
             case 3:
               object.markedForDeletion = true;
               this.type = 2;
-              this.addToScore(10);
+              this.addToScore(100);
               this.pushPaids(new Paid(this.x, this.y, this.frame));
               break;
               case 4:
               object.markedForDeletion = true;
               this.type = 7;
-              this.addToScore(55);
+              this.addToScore(400);
               this.pushExplosion(new Explosion(this.x, this.y, this.width));
               break;
               case 5:
               object.markedForDeletion = true;
               this.type = 7;
-              this.addToScore(55);
+              this.addToScore(5);
               this.pushExplosion(new Explosion(this.x, this.y, this.width));
               break;
             default:
               object.markedForDeletion = true;
               this.type = 6;
-              this.addToScore(10);
+              this.addToScore(100);
               this.markedForDeletion = true;
               this.pushPaids(new Paid(this.x, this.y, this.frame));
           }

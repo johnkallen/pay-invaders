@@ -36,12 +36,10 @@ class Player {
     this.shakeFrameInterval = 50;
     this.throwInProgress = false;
     
-    // this.randomColors = [Math.floor(Math.random() * 255),Math.floor(Math.random() * 255),Math.floor(Math.random() * 255)];
-    // this.color = 'rgb(' + this.randomColors[0] + ',' + this.randomColors[1] + ',' + this.randomColors[2] + ')';
     this.gameLost = gameLost;
     this.getKeys = getKeys;
     this.pushCard = pushCard;
-    // this.hasTrail = Math.random() > 0.5;
+
   }
 
   update(deltatime) {
@@ -78,13 +76,6 @@ class Player {
     }
     if (this.action === 2 && this.lastX === this.x) this.action = 0;
     this.lastX = this.x;
-
-    // if (this.y < 0 || this.y > window.innerHeight - this.height) {
-    //   this.directionY = this.directionY * -1;
-    // }
-    // this.x -= this.directionX;
-    // this.y += this.directionY;
-    // if (this.x < 0 - this.width) this.markedForDeletion = true;
 
     
     this.timeSinceLastFrame += deltatime;
@@ -153,6 +144,9 @@ class Player {
     const sprH = this.height;
     const x = this.x;
     const y = window.innerHeight - (this.spriteHeight * this.sizeModifier) - (window.innerHeight * 0.03);
+
+
+    // ctx.strokeRect(this.x,this.y,this.width,this.height);
 
     if (this.facingLeft) {
       // FLIP IMAGE
