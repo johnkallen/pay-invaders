@@ -33,18 +33,6 @@ window.addEventListener("keyup",  function(e) {
 
 
 window.addEventListener('click', function(e) {
-  const canvas = document.getElementById('canvas2');
-  // const collisonCtx = canvas.getContext('2d');
-  // const detectPixelColor = collisonCtx.getImageData(e.x, e.y, 1, 1);
-  // const pc = detectPixelColor.data;
-  // ravens.forEach(object => {
-  //   if (object.randomColors[0] === pc[0] && object.randomColors[1] === pc[1] && object.randomColors[2] === pc[2]) {
-  //     // collision detected
-  //     object.markedForDeletion = true;
-  //     score++;
-  //     explosions.push(new Explosion(object.x, object.y, object.width));
-  //   }
-  // })
 
 });
 
