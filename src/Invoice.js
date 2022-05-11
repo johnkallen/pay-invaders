@@ -5,7 +5,7 @@ import Explosion from './Explosion';
 
 class Invoice {
 
-  constructor(type, x, y, getCards, addToScore, pushPaids, pushExplosion, row, player, gameLost, setEdgeDetected) {
+  constructor(type, x, y, getCards, addToScore, pushPaids, pushExplosion, row, player, gameLost, setEdgeDetected, subtractInvader) {
     this.spriteWidth = 500;
     this.spriteHeight = 500;
     this.sizeModifier = 0.3;
@@ -34,6 +34,7 @@ class Invoice {
     this.player = player;
     this.gameLost = gameLost;
     this.setEdgeDetected = setEdgeDetected;
+    this.subtractInvader = subtractInvader;
     
     
   }
@@ -80,7 +81,7 @@ class Invoice {
 
       // Check for Player Collision
       const pX = this.player.x + this.player.width * 0.25;
-      const pW = this.player.width * 0.55;
+      const pW = this.player.width * 0.5;
       const pY = this.player.y + this.player.height * 0.10;
       const pH = this.player.height * 0.95;
       if (pX > myX + myW ||
@@ -110,6 +111,7 @@ class Invoice {
               this.type = 6;
               this.addToScore(300);
               this.markedForDeletion = true;
+              this.subtractInvader();
               this.pushPaids(new Paid(this.x, this.y, this.frame));
               break;
             case 2:
@@ -128,12 +130,16 @@ class Invoice {
               object.markedForDeletion = true;
               this.type = 7;
               this.addToScore(400);
+              this.markedForDeletion = true;
+              this.subtractInvader();
               this.pushExplosion(new Explosion(this.x, this.y, this.width));
               break;
               case 5:
               object.markedForDeletion = true;
               this.type = 7;
               this.addToScore(5);
+              this.markedForDeletion = true;
+              this.subtractInvader();
               this.pushExplosion(new Explosion(this.x, this.y, this.width));
               break;
             default:
@@ -141,6 +147,7 @@ class Invoice {
               this.type = 6;
               this.addToScore(100);
               this.markedForDeletion = true;
+              this.subtractInvader();
               this.pushPaids(new Paid(this.x, this.y, this.frame));
           }
         }

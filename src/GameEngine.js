@@ -112,6 +112,9 @@ class GameEngine extends React.Component {
 
   addToScore = (points) => {
     score += points;
+  }
+
+  subtractInvader = () => {
     totalInvaders--;
     console.log(totalInvaders);
   }
@@ -215,7 +218,8 @@ class GameEngine extends React.Component {
               if (maxFraud > 0 && i === 0 && j === 1) { invaderType = 5; maxFraud--;}
               if (maxOverCharge > 0 && i === 0 && j === 3) { invaderType = 4; maxOverCharge--;}
               
-              const invoice = new Invoice(invaderType, pos, row.y, this.getCards, this.addToScore, this.pushPaid, this.pushExplosion, row, player, this.gameLost, this.setEdgeDetected);
+              const invoice = new Invoice(invaderType, pos, row.y, this.getCards, this.addToScore, this.pushPaid, this.pushExplosion, row, 
+                player, this.gameLost, this.setEdgeDetected, this.subtractInvader);
               invoices.push(invoice);
               pos = pos + invaderWidth + invaderSpacing;
             }
