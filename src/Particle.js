@@ -21,7 +21,7 @@ class Particle {
     this.radius += 0.3;
     if (this.radius > this.maxRadius - 5) this.markedForDeletion = true;
   }
-  draw(ctx, collisionCtx) {
+  draw(ctx) {
 
     ctx.save();
     ctx.globalAlpha = 1 - (this.radius / this.maxRadius);

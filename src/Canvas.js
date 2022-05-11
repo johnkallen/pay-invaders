@@ -10,14 +10,12 @@ const Canvas = props => {
     
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
-    const collision = collisionRef.current
-    const collisionCtx = collision.getContext('2d')
-    
+
     let animationFrameId
     
     const render = (timestamp) => {
       
-      draw(ctx, collisionCtx, timestamp)
+      draw(ctx, timestamp)
       if (!gamePaused) animationFrameId = window.requestAnimationFrame(render)
       
     }
@@ -30,7 +28,7 @@ const Canvas = props => {
   
   return (
   <div>
-    <canvas id="canvas2" ref={collisionRef} {...rest}/>
+    {/* <canvas id="canvas2" ref={collisionRef} {...rest}/> */}
     <canvas id="canvas1" ref={canvasRef} {...rest}/>
   </div>)
  
