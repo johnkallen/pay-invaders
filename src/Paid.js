@@ -1,4 +1,5 @@
 import paidImg from './images/invoices.png';
+import paidSnd from './sounds/ka-ching.mp3';
 
 class Paid {
 
@@ -20,16 +21,24 @@ class Paid {
     this.markedForDeletion = false;
     this.image = new Image();
     this.image.src = paidImg;
+    this.paidSound = new Audio();
+    this.paidSound.src = paidSnd;
+    this.soundPlayed = false;
     this.frame = frame;
     this.fadeOutTime = 500;
     this.currentTime = this.fadeOutTime;
     this.angle = 0;
     this.spin = Math.random() < 0.5 ? -1 : 1;
+
     
   }
 
   update(deltatime) {
     
+    if (!this.soundPlayed) {
+      this.soundPlayed = true;
+      this.paidSound.play();
+    }
     // this.angle += 5;
     this.x += this.directionX;
     this.y += this.directionY;

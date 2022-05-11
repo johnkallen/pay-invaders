@@ -4,7 +4,6 @@ const Canvas = props => {
   
   const { draw, gamePaused, ...rest } = props
   const canvasRef = useRef(null)
-  const collisionRef = useRef(null)
   
   useEffect(() => {
     
@@ -28,7 +27,6 @@ const Canvas = props => {
   
   return (
   <div>
-    {/* <canvas id="canvas2" ref={collisionRef} {...rest}/> */}
     <canvas id="canvas1" ref={canvasRef} {...rest}/>
   </div>)
  

@@ -1,12 +1,11 @@
 import invoiceImg from './images/invoices.png';
-import paidSnd from './sounds/ka-ching.mp3';
-import explodeSnd from './sounds/boom.wav';
 import Paid from './Paid';
+import Explosion from './Explosion';
 
 
 class Invoice {
 
-  constructor(type, x, y, getCards, addToScore, pushPaids, gameLost, getKeys, pushCard) {
+  constructor(type, x, y, getCards, addToScore, pushPaids, pushExplosion) {
     this.spriteWidth = 500;
     this.spriteHeight = 500;
     this.sizeModifier = 0.3;
@@ -22,11 +21,6 @@ class Invoice {
     this.facingLeft = false;
     this.image = new Image();
     this.image.src = invoiceImg;
-
-    this.paidSound = new Audio();
-    this.paidSound.src = paidSnd;
-    this.explodeSound = new Audio();
-    this.explodeSound.src = explodeSnd;
     this.type = type;
     this.frame = 0;
     this.maxFrame = 2;
@@ -35,10 +29,10 @@ class Invoice {
     this.timeSinceLastFrame = 0;
     this.frameInterval = 500;
 
-
     this.getCards = getCards;
     this.addToScore = addToScore;
-    this.pushPaids =pushPaids;
+    this.pushPaids = pushPaids;
+    this.pushExplosion = pushExplosion;
     
   }
 
@@ -50,17 +44,6 @@ class Invoice {
       if (this.frame > this.maxFrame) this.frame = 0;
       else this.frame++;
       this.timeSinceLastFrame = 0;
-
-      switch(this.type) {
-        case 6:
-          this.frame = 1; // Hold Up
-
-
-          
-          break;
-        default:
-          // SINGLE INVOICE
-      }
 
     }
 
@@ -82,22 +65,49 @@ class Invoice {
           object.y + object.height < myY) {
             // no collision       
         } else {
-          // collision detected
-          // console.log('*****  COLLISION!!!  *****');
-          if (this.type < 4) {
-            object.markedForDeletion = true;
-            this.type = 6;
-            this.paidSound.play();
-            this.addToScore(10);
-            this.markedForDeletion = true;
-            this.pushPaids(new Paid(this.x, this.y, this.frame));
+          // *** collision detected ***
+          switch(this.type) {
+            case 1:
+              object.markedForDeletion = true;
+              this.type = 6;
+              this.addToScore(10);
+              this.markedForDeletion = true;
+              this.pushPaids(new Paid(this.x, this.y, this.frame));
+              break;
+            case 2:
+              object.markedForDeletion = true;
+              this.type = 1;
+              this.addToScore(10);
+              this.pushPaids(new Paid(this.x, this.y, this.frame));
+              break;
+            case 3:
+              object.markedForDeletion = true;
+              this.type = 2;
+              this.addToScore(10);
+              this.pushPaids(new Paid(this.x, this.y, this.frame));
+              break;
+              case 4:
+              object.markedForDeletion = true;
+              this.type = 7;
+              this.addToScore(55);
+              this.pushExplosion(new Explosion(this.x, this.y, this.width));
+              break;
+              case 5:
+              object.markedForDeletion = true;
+              this.type = 7;
+              this.addToScore(55);
+              this.pushExplosion(new Explosion(this.x, this.y, this.width));
+              break;
+            default:
+              object.markedForDeletion = true;
+              this.type = 6;
+              this.addToScore(10);
+              this.markedForDeletion = true;
+              this.pushPaids(new Paid(this.x, this.y, this.frame));
           }
         }
       });
     }
-
-
-    // if (this.x < 0 - this.width) this.gameLost();
     
   }
 
