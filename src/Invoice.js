@@ -5,7 +5,7 @@ import Explosion from './Explosion';
 
 class Invoice {
 
-  constructor(type, x, y, getCards, addToScore, pushPaids, pushExplosion) {
+  constructor(type, x, y, getCards, addToScore, pushPaids, pushExplosion, row) {
     this.spriteWidth = 500;
     this.spriteHeight = 500;
     this.sizeModifier = 0.3;
@@ -33,6 +33,7 @@ class Invoice {
     this.addToScore = addToScore;
     this.pushPaids = pushPaids;
     this.pushExplosion = pushExplosion;
+    this.row = row;
     
   }
 

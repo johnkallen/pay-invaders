@@ -6,8 +6,8 @@ import Invoice from './Invoice';
 import Explosion from './Explosion';
 
 import './GameEngine.css';
+import Row from './Row';
 
-let invoice = undefined;
 
 let player = undefined;
 let keys = {};
@@ -16,8 +16,11 @@ let invoices = [];
 let paids = [];
 let bits = [];
 let explosions = [];
+let rows = [];
 let particles = [];
 let score = 0;
+
+
 
 
 let lastTime = 0;
@@ -160,9 +163,39 @@ class GameEngine extends React.Component {
           keys = {}; cards = []; invoices = []; paids = [];
           bits = []; explosions = []; particles = []; score = 0;
 
-          invoice = new Invoice(3, window.innerWidth/2, window.innerHeight/3, this.getCards, this.addToScore, this.pushPaid, this.pushExplosion);
-          invoices.push(invoice);
+          const screenCenter = window.innerWidth/2;
+          const testInvoice = new Invoice(0, window.innerWidth/2, window.innerHeight/3, this.getCards, this.addToScore, this.pushPaid, this.pushExplosion);
+          const invaderWidth = testInvoice.width;
+          const invaderHeight = testInvoice.height;
+          const invaderSpacing = invaderWidth * 0.2;
+          const invadersPerRow = 5;
+          const invadersRows = 3;
+
+          for (let i = 0; i < invadersRows; i++) {
+
+            const rowHeight = invaderHeight;
+            const row = new Row(i, rowHeight * i + 30);
+            rows.push(row);
+            let pos = screenCenter - (((invadersPerRow * invaderWidth) + (invadersPerRow - 1) * invaderSpacing))/2;
+            
+            for (let j = 0; j < invadersPerRow; j++) {
+              const randNum = Math.random() * 100 + 1;
+              let invaderType = 0;
+              if (randNum > 90) invaderType = 5;
+              if (randNum > 80 && randNum < 91) invaderType = 4;
+              if (randNum > 40 && randNum < 81) invaderType = 3;
+              // Force at least 1 of each
+              if (i === 0 && j === 1) invaderType = 5;
+              if (i === 0 && j === 3) invaderType = 4;
+              
+              const invoice = new Invoice(invaderType, pos, row.y, this.getCards, this.addToScore, this.pushPaid, this.pushExplosion, row);
+              invoices.push(invoice);
+              pos = pos + invaderWidth + invaderSpacing;
+            }
+          }
           player = new Player(this.gameLost, this.getKeys, this.pushCard);
+            
+          
 
           lastScene = scene;
         } else {
