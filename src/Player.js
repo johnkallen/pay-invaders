@@ -1,11 +1,12 @@
 import playerImg from './images/player.png';
 import throwSnd from './sounds/throw.wav';
 import Card from './Card';
+import BigCard from './BigCard';
 
 
 class Player {
 
-  constructor(gameLost, getKeys, pushCard) {
+  constructor(gameLost, getKeys, pushCard, getBossStatus, pushParticle, getBoss, changeScene, setFadeOut) {
     this.spriteWidth = 512;
     this.spriteHeight = 512;
     this.sizeModifier = 0.5;
@@ -30,7 +31,7 @@ class Player {
     this.throwMaxFrame = 6;
     this.shakeLeft = false;
     this.timeSinceLastFrame = 0;
-    this.idleFrameInterval = 500;
+   
     this.walkFrameInterval = 100;
     this.throwFrameInterval = 100;
     this.shakeFrameInterval = 50;
@@ -39,41 +40,56 @@ class Player {
     this.gameLost = gameLost;
     this.getKeys = getKeys;
     this.pushCard = pushCard;
+    this.getBossStatus = getBossStatus;
+    this.pushParticle = pushParticle;
+    this.getBoss = getBoss;
+    this.changeScene = changeScene;
+    this.setFadeOut = setFadeOut;
 
   }
 
   update(deltatime) {
 
-    // Update Player Controls
-    const keys = this.getKeys();
-    if (!this.throwInProgress && (keys['a'] || keys['ArrowLeft'])) {
-      // Move Left
-      this.facingLeft = true;
-      if (this.x > 10) {
-        this.x -= this.directionX;
-        this.action = 2;
-      }
+    const bossStatus = this.getBossStatus();
+
+    if (bossStatus === 2) {
+      if (this.x + this.width/2 > window.innerWidth/2) this.facingLeft = true;
+      else this.facingLeft = false;
+      this.action = 3;
     }
-    if (!this.throwInProgress && (keys['d'] || keys['ArrowRight'])) {
-      // Move Right;
-      this.facingLeft = false;
-      if (this.x < window.innerWidth - this.width) {
-        this.x += this.directionX;
-        this.action = 2;
+    if (this.action === 3 && bossStatus === 4) this.action = 0;
+
+    if (bossStatus !== 2) {
+      // Update Player Controls
+      const keys = this.getKeys();
+      if (!this.throwInProgress && (keys['a'] || keys['ArrowLeft'])) {
+        // Move Left
+        this.facingLeft = true;
+        if (this.x > 10) {
+          this.x -= this.directionX;
+          this.action = 2;
+        }
       }
-    }
-    if (keys['Shift']) {
-      // Throw Virtual Payment
-      if (!this.throwInProgress) {
-        this.throwInProgress = true;
-        this.frame = 0; // Insure we start at frame 0
-        this.action = 1;
+      if (!this.throwInProgress && (keys['d'] || keys['ArrowRight'])) {
+        // Move Right;
+        this.facingLeft = false;
+        if (this.x < window.innerWidth - this.width) {
+          this.x += this.directionX;
+          this.action = 2;
+        }
+      }
+      if (keys['Shift']) {
+        // Throw Virtual Payment
+        if (!this.throwInProgress) {
+          this.throwInProgress = true;
+          this.frame = 0; // Insure we start at frame 0
+          this.action = 1;
+        }
+
       }
 
     }
-    if (keys[' ']) {
-      this.action = 3;
-    }
+
     if (this.action === 2 && this.lastX === this.x) this.action = 0;
     this.lastX = this.x;
 
@@ -94,9 +110,17 @@ class Player {
           if (this.frame === 1) this.sound.play();
           if (this.frame === 3) {
             if (this.facingLeft) {
-              this.pushCard(new Card(this.x + this.width * 0.19, this.y + this.height * 0.1, this.sizeModifier));
+              if (bossStatus === 4) {
+                this.pushCard(new BigCard(this.x + this.width * 0.19, this.y + this.height * 0.1, 0.1,this.pushParticle, this.getBoss, this.changeScene, this.setFadeOut));
+              } else {              
+                this.pushCard(new Card(this.x + this.width * 0.19, this.y + this.height * 0.1, this.sizeModifier));
+              }
             } else {
-              this.pushCard(new Card(this.x + this.width * 0.7, this.y + this.height * 0.1, this.sizeModifier));
+              if (bossStatus === 4) {
+                this.pushCard(new BigCard(this.x + this.width * 0.7, this.y + this.height * 0.1, 0.1, this.pushParticle, this.getBoss, this.changeScene, this.setFadeOut));
+              } else {
+                this.pushCard(new Card(this.x + this.width * 0.7, this.y + this.height * 0.1, this.sizeModifier));
+              }
             }
           }
           this.timeSinceLastFrame = 0;
@@ -146,7 +170,7 @@ class Player {
     const y = window.innerHeight - (this.spriteHeight * this.sizeModifier) - (window.innerHeight * 0.03);
 
 
-    ctx.strokeRect(this.x,this.y,this.width,this.height);
+    // ctx.strokeRect(this.x,this.y,this.width,this.height);
 
     if (this.facingLeft) {
       // FLIP IMAGE

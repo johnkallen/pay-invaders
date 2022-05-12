@@ -91,8 +91,8 @@ class Invoice {
           // no collision       
       } else {
         // *** collision with PLAYER detected ***
-        console.log('pX: ' + pX + '  pW: ' + pW + '  pY: ' + pY + '  pH: ' + pH);
-        console.log('mX: ' + myX + '  mW: ' + myW + '  mY: ' + myY + '  mH: ' + myH);
+        // console.log('pX: ' + pX + '  pW: ' + pW + '  pY: ' + pY + '  pH: ' + pH);
+        // console.log('mX: ' + myX + '  mW: ' + myW + '  mY: ' + myY + '  mH: ' + myH);
         this.gameLost();
       }
 
